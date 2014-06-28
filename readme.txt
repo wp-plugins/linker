@@ -1,9 +1,9 @@
 === Linker ===
-Contributors: KingYes, ariel.k
+Contributors: pojome, KingYes, ariel.k
 Tags: click tracking, custom post types, redirect, 301, outbound links, pretty links, link manager, links, google analytics, affiliates, external links,
 Requires at least: 3.5
 Tested up to: 3.9
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 
 Manage, create and track outbound links by custom pretty links with your domain. e.g. your-domain.com/go/fb-link
@@ -17,11 +17,14 @@ Linker is tracking click counts and save them of a custom field on that custom p
 <h4>Integration with Google Analytics</h4>
 You can track with Google Analytics to get full statistics by Event Tracking.
 
- This plagin work well too with [Google Analytics for WordPress](http://wordpress.org/plugins/google-analytics-for-wordpress/) by Yoast.
+ This plugin work well too with [Google Analytics for WordPress](http://wordpress.org/plugins/google-analytics-for-wordpress/) by Yoast.
 
 Go to the Setting Page of Google Analytics under the Setting Menu, and go to > Internal Links to Track as Outbound  > enter "/go/" in the field > choose Label to use.
 
 Now you can show up in Analytics all clicks out. go to Content > Event Tracking > Categories, and you’ll see your Label that used. that's all.
+
+<h4>Translators:</h4>
+* Hebrew (he_IL) + RTL Support - [Pojo.me](http://pojo.me/)
 
 <h4>Thanks</h4>
 We took inspiration to our plugin from [Simple URL](http://wordpress.org/plugins/simple-urls/) plugin - so thank you so much, you done good job.
@@ -42,8 +45,8 @@ Would you like to like to contribute to Linker? You are more than welcome to sub
 
 == Screenshots ==
 
-1. New Link
-2. All Links
+1. All Links
+2. New Link
 
 == Frequently Asked Questions ==
 
@@ -58,6 +61,9 @@ Would you like to like to contribute to Linker? You are more than welcome to sub
 
 
 == Changelog ==
+
+= 1.0.1 =
+* Added translate: Hebrew (he_IL) - Thanks to [Pojo.me](http://pojo.me/)
 
 = 1.0.0 =
 * Blastoff!
