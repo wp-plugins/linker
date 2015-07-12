@@ -173,6 +173,95 @@ class Linker_CPT {
 		
 		die();
 	}
+
+	/**
+	 * Add Dashboard Widget for Linker
+	 */
+	public function linker_add_dashboard_widget() {
+		wp_add_dashboard_widget(
+			'linker_dashboard_widget',
+			__( 'Linker - Top 10', 'linker' ),
+			array( &$this, 'linker_dashboard_widget_function' )
+		);	
+	}
+
+	/**
+	 * Add Dashboard Function for Linker
+	 */
+	public function linker_dashboard_widget_function() {
+		$posts = get_posts(
+			array(
+				'post_type' => 'linker',
+				'post_status' => 'publish',
+				'fields' => 'ids',
+				'meta_key' => '_linker_count',
+				'orderby' => 'meta_value_num',
+				'order' => 'DESC',
+				'posts_per_page' => 10,
+			)
+		);
+		
+		if ( empty( $posts ) ) {
+			echo '<p>' . __( 'There are no stats available yet!', 'linker' ) . '</p>';
+			return;
+		}
+		?>
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+			<thead>
+			<tr align="<?php echo is_rtl() ? 'right' : 'left'; ?>">
+				<th scope="col"><?php _e( 'Redirect to', 'linker' ); ?></th>
+				<th scope="col"><?php _e( 'Edit', 'linker' ); ?></th>
+				<th scope="col"><?php _e( 'Clicks', 'linker' ); ?></th>
+			</tr>
+			</thead>
+			<tbody>
+			<?php
+			//loop over each post
+			foreach ( $posts as $post_id ) :
+				// Get the meta you need from each post
+				$link       = get_post_meta( $post_id, '_linker_redirect', true );
+				$link_count = absint( get_post_meta( $post_id, '_linker_count', true ) );
+				?>
+				<tr>
+					<td><a target="_blank" href="<?php echo $link; ?>"><?php echo $link; ?></a></td>
+					<td><a href="<?php echo get_edit_post_link( $post_id ); ?>"><?php _e( 'Edit', 'linker' ); ?></a></td>
+					<td><?php echo $link_count; ?></td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+		<?php
+	}
+
+	/**
+	 * Add order by Clicks
+	 * 
+	 * @param array $columns
+	 *
+	 * @return array
+	 */
+	public function sortable_linker_clicks_column( $columns ) {
+		$columns['linker_clicks'] = 'linker_clicks';
+
+		return $columns;
+	}
+
+	/**
+	 * Add order by Clicks
+	 * 
+	 * @param WP_Query $query
+	 */
+	public function clicks_orderby( $query ) {
+		if ( ! is_admin() )
+			return;
+
+		$orderby = $query->get( 'orderby' );
+
+		if ( 'linker_clicks' == $orderby ) {
+			$query->set( 'meta_key', '_linker_count' );
+			$query->set( 'orderby', 'meta_value_num' );
+		}
+	}
 	
 	public function __construct() {
 		// TODO: please add updated messages
@@ -186,6 +275,13 @@ class Linker_CPT {
 		add_action( 'manage_posts_custom_column', array( &$this, 'custom_columns' ) );
 		add_action( 'save_post', array( &$this, 'save_post' ) );
 		add_action( 'template_redirect', array( &$this, 'count_and_redirect' ) );
+		
+		// Add Dashboard Widget for Linker
+		add_action( 'wp_dashboard_setup', array( &$this, 'linker_add_dashboard_widget' ));
+		
+		// Add order by Clicks
+		add_action( 'pre_get_posts', array( &$this, 'clicks_orderby' ) );
+		add_filter( 'manage_edit-linker_sortable_columns', array( &$this, 'sortable_linker_clicks_column' ) );
 	}
 	
 }
