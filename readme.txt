@@ -2,8 +2,8 @@
 Contributors: pojo.me, KingYes, ariel.k
 Tags: click tracking, custom post types, redirect, 301, outbound links, pretty links, link manager, links, google analytics, affiliates, external links,
 Requires at least: 3.5
-Tested up to: 4.2.2
-Stable tag: 1.0.6
+Tested up to: 4.3
+Stable tag: 1.1.0
 License: GPLv2 or later
 
 Manage, create and track outbound links by custom pretty links with your domain. e.g. your-domain.com/go/fb-link
@@ -63,6 +63,13 @@ Would you like to like to contribute to Linker? You are more than welcome to sub
 
 == Changelog ==
 
+
+= 1.1.0 =
+* Added filter by Author ([#16](https://github.com/KingYes/wp-linker/pull/16))
+* Added readonly field for Copy-Paste linker
+* Updated Dashboard Output
+* Dashboard info and CSS external file
+* Tested up to WordPress v4.3
 
 = 1.0.6 =
 * Added Dashboard Widget and Orderby clicks ([#13](https://github.com/KingYes/wp-linker/pull/13)).
