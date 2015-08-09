@@ -43,17 +43,17 @@ class Linker_CPT {
 		global $post;
 
 		$messages['linker'] = array(
-			0  => '', // Unused. Messages start at index 1.
-			1  => __( 'Link updated.', 'linker' ),
-			2  => __( 'Custom field updated.', 'linker' ),
-			3  => __( 'Custom field deleted.', 'linker' ),
-			4  => __( 'Link updated.', 'linker' ),
+			0 => '', // Unused. Messages start at index 1.
+			1 => __( 'Link updated.', 'linker' ),
+			2 => __( 'Custom field updated.', 'linker' ),
+			3 => __( 'Custom field deleted.', 'linker' ),
+			4 => __( 'Link updated.', 'linker' ),
 			/* translators: %s: date and time of the revision */
-			5  => isset( $_GET['revision'] ) ? sprintf( __( 'Link restored to revision from %s', 'linker' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
-			6  => __( 'Link published.', 'linker' ),
-			7  => __( 'Link saved.', 'linker' ),
-			8  => __( 'Link submitted.', 'linker' ),
-			9  => sprintf( __( 'Post scheduled for: <strong>%1$s</strong>.', 'linker' ),
+			5 => isset( $_GET['revision'] ) ? sprintf( __( 'Link restored to revision from %s', 'linker' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+			6 => __( 'Link published.', 'linker' ),
+			7 => __( 'Link saved.', 'linker' ),
+			8 => __( 'Link submitted.', 'linker' ),
+			9 => sprintf( __( 'Post scheduled for: <strong>%1$s</strong>.', 'linker' ),
 				// translators: Publish box date format, see http://php.net/date
 				date_i18n( __( 'M j, Y @ G:i', 'linker' ), strtotime( $post->post_date ) ) ),
 			10 => __( 'Link draft updated.', 'linker' ),
@@ -90,7 +90,7 @@ class Linker_CPT {
 				break;
 			
 			case 'linker_permalink' :
-				echo make_clickable( get_permalink( $post->ID ) );
+				echo '<input type="text" class="linker-permalink-copy-paste" value="' . esc_attr( get_permalink( $post->ID ) ) . '" readonly />';
 				break;
 			
 			case 'linker_clicks' :
@@ -108,19 +108,6 @@ class Linker_CPT {
 			'normal',
 			'high'
 		);
-	}
-
-	public function admin_header() {
-		// TODO: move to a separate file.
-		?><style>
-			#adminmenu #menu-posts-linker div.wp-menu-image:before {
-				content: "\f103";
-			}
-			.fixed .column-linker_clicks {
-				width: 10%;
-			}
-		</style>
-	<?php
 	}
 
 	public function render_meta_box( $post ) {
@@ -262,26 +249,68 @@ class Linker_CPT {
 			$query->set( 'orderby', 'meta_value_num' );
 		}
 	}
+
+	/**
+	 * Add filter by Author
+	 */
+	public function linker_filter_by_author() {
+		global $typenow;
+		
+		if ( 'linker' === $typenow ) {
+			wp_dropdown_users(
+				array(
+					'name' => 'author',
+					'show_option_all' => __( 'View all authors', 'linker' ),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Add external CSS Stylesheet file
+	 * 
+	 * @param $hook
+	 */
+	public function dashboard_widget_linker_external_css( $hook ) {
+		global $typenow;
+		
+		$include_style = false;
+		if ( 'index.php' === $hook )
+			$include_style = true;
+		
+		if ( 'edit.php' === $hook && 'linker' === $typenow )
+			$include_style = true;
+		
+		if ( ! $include_style )
+			return;
+		
+		wp_enqueue_style( 'linker-dashboard-widget-styles', LINKER_PLUGIN_URL . '/assets/css/styles.css' );
+	}
 	
 	public function __construct() {
-		// TODO: please add updated messages
-		
 		add_action( 'init', array( &$this, 'register_post_type' ) );
-		add_action( 'admin_menu', array( &$this, 'register_meta_box' ) );
-		add_action( 'admin_head', array( &$this, 'admin_header' ) );
-		add_filter( 'plugin_action_links_' . LINKER_BASE, array( &$this, 'plugin_action_links' ) );
+		add_filter( 'post_updated_messages', array( &$this, 'post_updated_messages' ) );
 		
+		add_action( 'admin_menu', array( &$this, 'register_meta_box' ) );
+		add_filter( 'plugin_action_links_' . LINKER_BASE, array( &$this, 'plugin_action_links' ) );
+
 		add_filter( 'manage_edit-linker_columns', array( &$this, 'admin_cpt_columns' ) );
 		add_action( 'manage_posts_custom_column', array( &$this, 'custom_columns' ) );
 		add_action( 'save_post', array( &$this, 'save_post' ) );
 		add_action( 'template_redirect', array( &$this, 'count_and_redirect' ) );
-		
+
 		// Add Dashboard Widget for Linker
-		add_action( 'wp_dashboard_setup', array( &$this, 'linker_add_dashboard_widget' ));
-		
+		add_action( 'wp_dashboard_setup', array( &$this, 'linker_add_dashboard_widget' ) );
+
 		// Add order by Clicks
 		add_action( 'pre_get_posts', array( &$this, 'clicks_orderby' ) );
 		add_filter( 'manage_edit-linker_sortable_columns', array( &$this, 'sortable_linker_clicks_column' ) );
+
+		// Add filter by Author
+		add_action( 'restrict_manage_posts', array( &$this, 'linker_filter_by_author' ) );
+
+		// Add external CSS Stylesheet file
+		add_action( 'admin_enqueue_scripts', array( &$this, 'dashboard_widget_linker_external_css' ) );
 	}
 	
 }
